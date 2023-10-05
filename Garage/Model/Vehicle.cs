@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Garage.Model
+﻿namespace Garage.Model
 {
     public class Vehicle : IVehicle
     {
         //unique
-        public string LicenseNumber { get; }
-        public string Colour { get; }
+        public string LicenseNumber { get; set; }
+        public string Colour { get; set; }
         public int NrOfWheels { get; }
 
 

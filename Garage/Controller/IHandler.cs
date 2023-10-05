@@ -1,9 +1,5 @@
 ﻿using Garage.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Garage.View;
 
 namespace Garage.Controller
 {
@@ -12,7 +8,7 @@ namespace Garage.Controller
         //Lista samtliga parkerade fordon
         IEnumerable<IVehicle> GetParkedVehicles();
         //Lista fordonstyper och hur många av varje som står i garaget
-        string GetVehicleTypesCount();
+        IEnumerable<VehicleDTO> GetCountOfEachType();
         //Lägga till och ta bort fordon ur garaget
         bool AddVehicle(IVehicle vehicle);
         bool RemoveVehicle(string licenseNr);
@@ -33,8 +29,9 @@ namespace Garage.Controller
         //Sätta en kapacitet(antal parkeringsplatser) vid instansieringen av ett nytt garage
         bool CreateGarage(int capacity);
         
-        bool LicenseIsUnique(string license);
+        bool LicenseAlreadyExists(string license);
         int CheckForFreeSpots();
+        IEnumerable<IVehicle> CustomQuery(IVehicle vehicle, VehicleType type);
 
         //Applikationen skall fel hantera indata på ett robust sätt, så att den inte kraschar vid felaktig inmatning eller användning.
     }

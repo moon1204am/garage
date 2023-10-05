@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Garage.Model
+﻿namespace Garage.Model
 {
     public interface IVehicle
     {
-        string LicenseNumber { get; }
-        string Colour { get; }
+        string LicenseNumber { get; set; }
+        string Colour { get; set; }
         int NrOfWheels { get; }
     }
 }

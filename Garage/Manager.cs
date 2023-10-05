@@ -1,11 +1,6 @@
 ﻿using Garage.Controller;
 using Garage.Model;
 using Garage.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Garage
 {
@@ -72,7 +67,6 @@ namespace Garage
                         default:
                             ui.Print("Illegal command.");
                             break;
-
                     }
                 }
                 catch (Exception e)
@@ -85,7 +79,7 @@ namespace Garage
         private void GetParkedVehicles()
         {
             var parkedVehicles = handler.GetParkedVehicles();
-            if (parkedVehicles.Count() == 0)
+            if (util.checkEmpty(parkedVehicles))
             {
                 ui.Print("No vehicles parked yet.");
                 return;
@@ -97,120 +91,150 @@ namespace Garage
 
         private void GetTypesOfVehicles()
         {
+            var types = handler.GetCountOfEachType();
+            if(util.checkEmpty(types))
+            {
+                ui.Print("No vehicle type is parked yet.");
+                return;
+            }
             ui.Print("Number of each vehicle type parked right now:\n");
-            ui.Print(handler.GetVehicleTypesCount());
-            //var types = handler.GetVehicleTypesCount();
-            //foreach (var kvp in types)
-            //{
-            //    Console.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-            //}
+            foreach (var v in types)
+                Console.WriteLine("Type = {0}, Nr = {1}", v.Type, v.NrOfType);
         }
 
-        private void ParkVehicle()
+        private bool ParkVehicle()
         {
             if (handler.CheckForFreeSpots() == 0)
                 throw new Exception("Parking garage is full.");
+                
+            IVehicle createdVehicle = GetVehicleSpecs();
+            if(createdVehicle == null)
+                return false;
 
-            //REFACTOR INPUT TO REUSE METHOD THAT RETURNS LICENSE NR, COLOUR, NR OF WHEELS
-            ui.Print("Enter license number");
-            var licenseNr = ui.GetInput().ToUpper();
-
-            while (!util.ValidateLicenseNumber(licenseNr) || !handler.LicenseIsUnique(licenseNr))
-            {
-                ui.Print("License number is either invalid or it already exists. Try again.");
-                licenseNr = ui.GetInput().ToUpper();
-            }
-
-            ui.Print("Enter colour");
-            var colour = ui.GetInput();
-            ui.Print("Enter nr of wheels");
-            var nrOfWheels = ui.GetInput();
-            CreateVehicle(licenseNr, colour, nrOfWheels);
+            CreateVehicle(createdVehicle);
+            return true;
         }
 
-        private void CreateVehicle(string licenseNr, string colour, string nrOfWheels)
+        private IVehicle? GetVehicleSpecs(bool isQuery = false)
         {
-            string input;
+            var licenseNr = GetLicenseNumber(isQuery);
+            if(licenseNr == "QUIT") return null;
+            ui.Print("Enter colour");
+            var colour = ui.GetInput().ToUpper();
+            ui.Print("Enter nr of wheels");
+            var nrOfWheels = ui.GetInput();
+            IVehicle newVehicle = new Vehicle(licenseNr, colour, util.ValidateNumber(nrOfWheels));
+            return newVehicle;
+        }
+
+        private string GetLicenseNumber(bool isQuery)
+        {
+            ui.Print("Enter license number");
+            var licenseNr = ui.GetInput().ToUpper();
+            if(isQuery) return licenseNr;
+            while (licenseNr != "QUIT")
+            {
+
+                if(util.ValidateLicenseNumber(licenseNr) && !handler.LicenseAlreadyExists(licenseNr))
+                    break;
+                if (!util.ValidateLicenseNumber(licenseNr))
+                    ui.Print("License number is invalid. Try again.");
+                if (handler.LicenseAlreadyExists(licenseNr))
+                    ui.Print("License nr already exists. Try again.");
+                    
+                ui.Print("Or type 'quit' to exit.");
+                licenseNr = ui.GetInput().ToUpper();
+            } 
+            return licenseNr;
+        }
+
+        private VehicleType GetVehicleType()
+        {
+            string input = ui.GetInput();
+            VehicleType parsedVehicle = Enum.TryParse(input.ToUpper(), out parsedVehicle) ? parsedVehicle : (VehicleType)Activator.CreateInstance(typeof(VehicleType));
+            return parsedVehicle;
+        }
+
+        private void CreateVehicle(IVehicle vehicle)
+        {
             ui.Print("Enter type of vehicle to park");
             ui.DisplayVehicleOptions();
 
             while (true)
             {
-                input = ui.GetInput();
-                switch (input)
+                switch (GetVehicleType())
                 {
-                    case "1":
-                        CreateAirplane(licenseNr, colour, nrOfWheels);
+                    case VehicleType.Airplane:
+                        CreateAirplane(vehicle);
                         return;
-                    case "2":
-                        CreateBoat(licenseNr, colour, nrOfWheels);
+                    case VehicleType.Boat:
+                        CreateBoat(vehicle);
                         return;
-                    case "3":
-                        CreateBus(licenseNr, colour, nrOfWheels);
+                    case VehicleType.Bus:
+                        CreateBus(vehicle);
                         return;
-                    case "4":
-                        CreateCar(licenseNr, colour, nrOfWheels);
+                    case VehicleType.Car:
+                        CreateCar(vehicle);
                         return;
-                    case "5":
-                        CreateMotorcycle(licenseNr, colour, nrOfWheels);
+                    case VehicleType.Motorcycle:
+                        CreateMotorcycle(vehicle);
                         return;
                     default:
                         ui.Print("Please choose of the vehicles listed.");
                         break;
                 }
             }
-
         }
 
-        private void CreateMotorcycle(string licenseNr, string colour, string nrOfWheels)
+        private void CreateMotorcycle(IVehicle vehicle)
         {
             ui.Print("Enter nr of seats");
             var nrOfSeats = ui.GetInput();
-            IVehicle motorCycleToPark = new Motorcycle(licenseNr, colour, util.ValidateNumber(nrOfWheels), util.ValidateNumber(nrOfSeats));
+            IVehicle motorCycleToPark = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfSeats));
             if (handler.AddVehicle(motorCycleToPark))
                 ui.Print($"Successfully parked {motorCycleToPark}");
             else
                 throw new Exception($"Could not park {motorCycleToPark}");
         }
 
-        private void CreateCar(string licenseNr, string colour, string nrOfWheels)
+        private void CreateCar(IVehicle vehicle)
         {
             ui.Print("Enter cylinder volume");
             var cylinderVolume = ui.GetInput();
-            IVehicle carToPark = new Car(licenseNr, colour, util.ValidateNumber(nrOfWheels), util.ValidateDouble(cylinderVolume));
+            IVehicle carToPark = new Car(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateDouble(cylinderVolume));
             if (handler.AddVehicle(carToPark))
                 ui.Print($"Successfully parked {carToPark}");
             else
                 throw new Exception($"Could not park {carToPark}");
         }
 
-        private void CreateBus(string licenseNr, string colour, string nrOfWheels)
+        private void CreateBus(IVehicle vehicle)
         {
             ui.Print("Enter fuel type");
             var fuelType = ui.GetInput();
-            IVehicle busToPark = new Bus(licenseNr, colour, util.ValidateNumber(nrOfWheels), fuelType);
+            IVehicle busToPark = new Bus(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, fuelType);
             if (handler.AddVehicle(busToPark))
                 ui.Print($"Successfully parked {busToPark}");
             else
                 throw new Exception($"Could not park {busToPark}");
         }
 
-        private void CreateBoat(string licenseNr, string colour, string nrOfWheels)
+        private void CreateBoat(IVehicle vehicle)
         {
             ui.Print("Enter length");
             var length = ui.GetInput();
-            IVehicle boatToPark = new Boat(licenseNr, colour, util.ValidateNumber(nrOfWheels), util.ValidateDouble(length));
+            IVehicle boatToPark = new Boat(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateDouble(length));
             if (handler.AddVehicle(boatToPark))
                 ui.Print($"Successfully parked {boatToPark}");
             else
                 throw new Exception($"Could not park {boatToPark}");
         }
 
-        private void CreateAirplane(string licenseNr, string colour, string nrOfWheels)
+        private void CreateAirplane(IVehicle vehicle)
         {
             ui.Print("Enter nr of engines");
             var nrOfEngines = ui.GetInput();
-            IVehicle airplaneToPark = new Airplane(licenseNr, colour, util.ValidateNumber(nrOfWheels), util.ValidateNumber(nrOfEngines));
+            IVehicle airplaneToPark = new Airplane(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfEngines));
             if (handler.AddVehicle(airplaneToPark))
                 ui.Print($"Successfully parked {airplaneToPark}");
             else
@@ -221,29 +245,34 @@ namespace Garage
         {
             ui.Print("Enter your license plate nr please.");
             string licenseNr = ui.GetInput().ToUpper();
-            if (!util.ValidateLicenseNumber(licenseNr))
-                throw new Exception("Not a valid license nr");
-            if (handler.RemoveVehicle(licenseNr))
-                ui.Print($"Successfully checked out vehicle with license nr {licenseNr}");
-            else
+            while(licenseNr != "QUIT")
             {
-                throw new Exception("Vehicle did not exist in the garage.");
+                if (handler.RemoveVehicle(licenseNr))
+                {
+                    ui.Print($"Successfully checked out vehicle with license nr {licenseNr}");
+                    break;
+                }
+                ui.Print($"Vehicle with license nr {licenseNr} did not exist in the garage. Try again or type 'quit' to exit.");
+                licenseNr = ui.GetInput().ToUpper();
             }
-
         }
 
         private void FindVehicleByLicense()
         {
             ui.Print("Enter license number: ");
             string licenseNr = ui.GetInput().ToUpper();
-            try
+            while (licenseNr != "QUIT")
             {
                 IVehicle foundVehicle = handler.GetVehicleByLicense(licenseNr);
-                ui.Print($"Vehicle with license nr {licenseNr} = {foundVehicle.ToString}");
-            }
-            catch (Exception)
-            {
-                ui.Print("No vehicle found with given license number");
+                if (foundVehicle != null)
+                {
+                    ui.Print($"Vehicle with license nr {licenseNr} = {foundVehicle.ToString()}");
+                    break;
+                }
+                ui.Print("No vehicle found with given license number. Try again.");
+                ui.Print("Or type 'quit' to exit.");
+
+                licenseNr = ui.GetInput().ToUpper();
             }
         }
 
@@ -251,11 +280,17 @@ namespace Garage
         {
             ui.Print("How many vehicles do you want to add?");
             var nr = ui.GetInput();
-            int nrToPark = util.ValidateNumber(nr);
-            if (nrToPark < 2) throw new Exception();
-            for (int i = 0; i < nrToPark; i++)
+            while (nr != "QUIT")
             {
-                ParkVehicle();
+                int nrToPark = util.ValidateNumber(nr);
+                if (nrToPark > 1)
+                {
+                    for (int i = 0; i < nrToPark; i++)
+                    {
+                        if (!ParkVehicle()) return;
+                    }
+                }
+                ui.Print("You need to park atleast 2 vehicles. Try again. Or type 'quit' to exit.");
             }
         }
 
@@ -263,55 +298,41 @@ namespace Garage
         {
             ui.Print("Enter capacity of garage");
             var capacity = ui.GetInput();
-
-            ui.Print($"Creating garage with capacity {capacity}...");
-            handler.CreateGarage(util.ValidateNumber(capacity));
-            ui.Print("Garage created.");
+            while(true)
+            {
+                try
+                {
+                    ui.Print($"Creating garage with capacity {capacity}...");
+                    if (handler.CreateGarage(util.ValidateNumber(capacity)))
+                    {
+                        ui.Print("Garage created.");
+                        break;
+                    }
+                } catch(Exception e)
+                {
+                    ui.Print($"Failed to create garage with capacity {capacity}. Try again.");
+                    ui.Print(e.Message);
+                }
+                capacity = ui.GetInput();
+            }
         }
         private void CustomQuery()
         {
-            bool isDone = false;
-            while (!isDone)
+
+            ui.Print("Write 'x' on license number and colour, and '0' on nr of wheels, if you DON'T want to query on them.");
+
+            IVehicle vehicleQuery = GetVehicleSpecs(true);
+            ui.DisplayVehicleOptions(true);
+            VehicleType type = GetVehicleType();
+            var result = handler.CustomQuery(vehicleQuery, type);
+            if (!result.Any())
             {
-                //vehicle
-                //vehicle and color
-                //vehicle and wheels
-                //vehicle and color and wheels
-
-
-                ui.Print("Choose query type" +
-                    "\n1. Vehicle" +
-                    "\n2. Vehicle and colour" +
-                    "\n3. Vehicle and wheels" +
-                    "\n4. Vehicle and color and wheels");
-
-                int query = util.ValidateNumber(ui.GetInput());
-
-                ui.Print("Enter vehicle to query on");
-                ui.DisplayVehicleOptions(true);
-
-                if (query == 1)
-                {
-
-                }
-                else if (query == 2)
-                {
-
-                }
-                else if (query == 3)
-                {
-
-                }
-                else if (query == 4)
-                {
-
-                }
-
-                ui.Print("Enter colour to query on");
-                string colour = ui.GetInput();
-                ui.Print("Enter nr of wheels to query on");
-                int nrOfWheels = util.ValidateNumber(ui.GetInput());
-
+                ui.Print("No result matched query.");
+                return;
+            }
+            foreach (var r in result)
+            {
+                ui.Print(r.ToString());
             }
         }
     }

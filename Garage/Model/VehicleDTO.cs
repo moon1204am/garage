@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Garage.Model
+﻿namespace Garage.Model
 {
-    internal class VehicleDTO
-    {
-        public string Type { get; set; }
-        public int NrOfType { get; set; }
-    }
+    public record VehicleDTO(string Type, int NrOfType);
 
-    internal record VehicleDTO2(string Type, int NrOfType);
+    internal class VehicleDTO2
+    {
+        public string LicenseNumber { get; set; }
+        public string Colour { get; set; }
+        public string NrOfWheels { get; set; }
+    }
 }

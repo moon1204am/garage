@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace Garage.View
 {
@@ -24,7 +19,7 @@ namespace Garage.View
             return double.TryParse(text, out var value) ? value : throw new Exception("Not a number");
         }
 
-        internal bool ValidateLicenseNumber(string licenseNumber)
+        public bool ValidateLicenseNumber(string licenseNumber)
         {
             // ^ start of string
             // [A-Z] a letter
@@ -36,6 +31,11 @@ namespace Garage.View
             // $ end of string
             Regex regex = new Regex("^[A-Za-z]{3}[0-9]{2}[A-Za-z0-9]{1}$");
             return regex.IsMatch(licenseNumber);
+        }
+
+        public bool checkEmpty<T>(IEnumerable<T> e) where T : class
+        {
+            return !e.Any();
         }
     }
 }

@@ -1,19 +1,10 @@
-﻿using Garage.Controller;
-using Garage.Model;
-using System.ComponentModel;
-using System.Security.Cryptography;
-
-namespace Garage.View
+﻿namespace Garage.View
 {
     internal class ConsoleUI : IUI
     {
 
-        public void Display()
-        {
-            Print("Welcome. Please create garage first.");
+        public void Display() => Print("Welcome. Please create garage first.");
             
-        }
-
         public void DisplayCommands()
         {
             Print("\n1. List all parked vehicles"
@@ -29,24 +20,18 @@ namespace Garage.View
 
         public void DisplayVehicleOptions(bool isQuery = false)
         {
-            Print("1. Airplane" +
-                "\n2. Boat" +
-                "\n3. Bus" +
-                "\n4. Car" +
-                "\n5. Motorcycle");
-            
-            if(isQuery)
-                Print("\n6. All");
+
+            foreach (VehicleType item in Enum.GetValues(typeof(VehicleType)))
+            {
+                if (!isQuery && item == VehicleType.All) continue;
+                Print($"{(int)item} {item}");
+            }
         }
 
-        public string GetInput()
-        {
-            return Console.ReadLine();
-        }
+        public string GetInput() => Console.ReadLine();
 
-        public void Print(string msg)
-        {
-            Console.WriteLine(msg);
-        }
+
+        public void Print(string msg) => Console.WriteLine(msg);
+
     }
 }
