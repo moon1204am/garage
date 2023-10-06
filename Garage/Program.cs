@@ -9,7 +9,8 @@ namespace Garage
         static void Main(string[] args)
         {
             IHandler handler = new GarageHandler();
-            Manager manager = new Manager(handler);
+            IUI ui = new ConsoleUI();
+            Manager manager = new Manager(handler, ui);
             manager.Start();
 
             //IHandler handler = new GarageHandler();

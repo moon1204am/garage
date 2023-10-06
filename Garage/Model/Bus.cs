@@ -3,7 +3,7 @@
     internal class Bus : Vehicle
     {
         public string FuelType { get; }
-        public Bus(string licenseNumber, string colur, int nrOfWheels, string fuelType) : base(licenseNumber, colur, nrOfWheels)
+        public Bus(string licenseNumber, string colour, int nrOfWheels, string fuelType) : base(licenseNumber, colour, nrOfWheels)
         {
             FuelType = fuelType;
         }

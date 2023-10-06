@@ -3,7 +3,7 @@
     internal class Boat : Vehicle
     {
         public double Length { get; }
-        public Boat(string licenseNumber, string colur, int nrOfWheels, double length) : base(licenseNumber, colur, nrOfWheels)
+        public Boat(string licenseNumber, string colour, int nrOfWheels, double length) : base(licenseNumber, colour, nrOfWheels)
         {
             Length = length;
         }

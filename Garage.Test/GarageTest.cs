@@ -5,53 +5,52 @@ namespace Garage.Test
 {
     public class GarageTest
     {
-        private Airplane vehicle;
+        private Airplane airplane;
+        private Car car;
+        Garage<IVehicle> garage;
 
         public GarageTest()
         {
-            vehicle = new Airplane("", "", 4, 5);
+            airplane = new Airplane("abc123", "white", 3, 3);
+            car = new Car("abc124", "black", 3, 2.2);
         }
 
         [Fact]
         public void AddAirplane_ShouldSucceed()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(1);
-            IVehicle vehicle = new Airplane("abc123", "white", 3, 3);
+            garage = new Garage<IVehicle>(1);
 
             //Act
-            bool res = garage.Insert(vehicle);
+            bool res = garage.Insert(airplane);
 
             //Assert
             Assert.True(res);
-            Assert.Equal(garage.First(), vehicle);
+            Assert.Equal(garage.First(), airplane);
         }
 
         [Fact]
         public void AddVehicles_GarageIsFull_ShouldFail()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(1);
-            IVehicle vehicle1 = new Airplane("abc123", "white", 3, 3);
-            IVehicle vehicle2 = new Car("abc124", "black", 3, 2.2);
+            garage = new Garage<IVehicle>(1);
 
             //Act
-            garage.Insert(vehicle1);
+            garage.Insert(airplane);
 
             //Assert
-            Assert.False(garage.Insert(vehicle2));
+            Assert.False(garage.Insert(car));
         }
 
         [Fact]
         public void RemoveVehicle_GarageHasVehicle_ShouldSucceed()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(1);
-            IVehicle vehicle = new Airplane("abc123", "white", 3, 3);
-            garage.Insert(vehicle);
+            garage = new Garage<IVehicle>(1);
+            garage.Insert(airplane);
 
             //Act
-            bool res = garage.Remove(vehicle);
+            bool res = garage.Remove(airplane);
 
             //Assert
             Assert.True(res);
@@ -60,10 +59,10 @@ namespace Garage.Test
         public void RemoveVehicle_VehicleNotInGarage_ShouldFail()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(1);
+            garage = new Garage<IVehicle>(1);
 
             //Act
-            bool res = garage.Remove(new Car("abc123", "black", 4, 5.4));
+            bool res = garage.Remove(car);
 
             //Assert
             Assert.False(res);
@@ -73,11 +72,9 @@ namespace Garage.Test
         public void GetNrOfVehicles_ShouldReturnCorrect()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(2);
-            IVehicle vehicle1 = new Airplane("abc123", "white", 3, 3);
-            IVehicle vehicle2 = new Car("abc124", "black", 3, 2.2);
-            garage.Insert(vehicle1);
-            garage.Insert(vehicle2);
+            garage = new Garage<IVehicle>(2);
+            garage.Insert(airplane);
+            garage.Insert(car);
             int expected = 2;
 
             //Act
@@ -92,11 +89,9 @@ namespace Garage.Test
         public void CheckIfGarageIsFull_ShouldReturnTrue()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(2);
-            IVehicle vehicle1 = new Airplane("abc123", "white", 3, 3);
-            IVehicle vehicle2 = new Car("abc124", "black", 3, 2.2);
-            garage.Insert(vehicle1);
-            garage.Insert(vehicle2);
+            garage = new Garage<IVehicle>(2);
+            garage.Insert(airplane);
+            garage.Insert(car);
             bool expected = true;
 
             //Act
@@ -110,11 +105,9 @@ namespace Garage.Test
         public void CheckNrOfFreeSpots_ShouldReturnCorrect()
         {
             //Arrange
-            Garage<IVehicle> garage = new Garage<IVehicle>(50);
-            IVehicle vehicle1 = new Airplane("abc123", "white", 3, 3);
-            IVehicle vehicle2 = new Car("abc124", "black", 3, 2.2);
-            garage.Insert(vehicle1);
-            garage.Insert(vehicle2);
+            garage = new Garage<IVehicle>(50);
+            garage.Insert(airplane);
+            garage.Insert(car);
             int expected = 48;
 
             //Act

@@ -1022,6 +1022,9 @@
       },
       "xunit.runner.visualstudio/2.4.5": {},
       "Garage/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
+        },
         "runtime": {
           "Garage.dll": {}
         }

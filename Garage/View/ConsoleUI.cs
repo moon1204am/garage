@@ -3,7 +3,9 @@
     internal class ConsoleUI : IUI
     {
 
-        public void Display() => Print("Welcome. Please create garage first.");
+        public void Display() => Print("Welcome. " +
+            "\n1. Please create garage first. " +
+            "\n2. Or load a previous garage.");
             
         public void DisplayCommands()
         {

@@ -7,22 +7,65 @@ namespace Garage
     internal class Manager
     {
         private IHandler handler;
-        ConsoleUI ui;
-        private Util util;
+        private IUI ui;
+        private Validator util;
         private bool keepReceivingCmds;
         
 
-        public Manager(IHandler handler) 
+        public Manager(IHandler handler, IUI ui) 
         {
             this.handler = handler;
-            ui = new ConsoleUI();
-            util = new Util();
+            this.ui = ui;
+            util = new Validator();
         }
         public void Start()
         {
-            ui.Display();
-            NewGarage();
+            
+            while(true)
+            {
+                ui.Display();
+                var input = ui.GetInput();
+                if (input == "1")
+                {
+                    NewGarage();
+                    break;
+                }
+                else if (input == "2")
+                {
+                    if(LoadGarage())
+                    {
+                        ui.Print("Garage successfully loaded");
+                        break;
+                    }
+                        
+                }
+                else
+                { 
+                    ui.Print("Not a valid command. Try again.");
+                    input = ui.GetInput();
+                }
+            }
             GetUserCommand();
+        }
+
+        private bool LoadGarage()
+        {
+            ui.Print("Enter garage name to load");
+            var input = ui.GetInput().ToUpper();
+            while(input != "QUIT")
+            {
+                try
+                {
+                    return handler.Load(input);
+                }
+                catch (Exception e)
+                {
+                    ui.Print(e.Message);
+                    ui.Print("Try again or type 'quit' to exit.");
+                }
+                input = ui.GetInput().ToUpper();
+            }
+            return false;
         }
 
         public void GetUserCommand()
@@ -62,6 +105,7 @@ namespace Garage
                             CustomQuery();
                             break;
                         case "0":
+                            SaveGarage();
                             keepReceivingCmds = false;
                             break;
                         default:
@@ -73,6 +117,22 @@ namespace Garage
                 {
                     Console.WriteLine(e.Message);
                 }
+            }
+        }
+
+        private void SaveGarage()
+        {
+            if(!handler.IsLoaded) 
+            {
+                ui.Print("Please enter a name of the garage.");
+                var name = ui.GetInput().ToUpper();
+                bool saved = handler.Save(name);
+                if (saved)
+                {
+                    ui.Print("Garage was saved.");
+                    return;
+                }
+                ui.Print("Garage could not be saved.");
             }
         }
 
@@ -99,7 +159,7 @@ namespace Garage
             }
             ui.Print("Number of each vehicle type parked right now:\n");
             foreach (var v in types)
-                Console.WriteLine("Type = {0}, Nr = {1}", v.Type, v.NrOfType);
+                Console.WriteLine("Vehicle type = {0}, Nr parked = {1}", v.Type, v.NrOfType);
         }
 
         private bool ParkVehicle()
@@ -107,7 +167,7 @@ namespace Garage
             if (handler.CheckForFreeSpots() == 0)
                 throw new Exception("Parking garage is full.");
                 
-            IVehicle createdVehicle = GetVehicleSpecs();
+            IVehicle createdVehicle = GetVehicleSpecs()!;
             if(createdVehicle == null)
                 return false;
 
@@ -118,7 +178,7 @@ namespace Garage
         private IVehicle? GetVehicleSpecs(bool isQuery = false)
         {
             var licenseNr = GetLicenseNumber(isQuery);
-            if(licenseNr == "QUIT") return null;
+            if(!isQuery && licenseNr == "QUIT") return null;
             ui.Print("Enter colour");
             var colour = ui.GetInput().ToUpper();
             ui.Print("Enter nr of wheels");
@@ -151,7 +211,7 @@ namespace Garage
         private VehicleType GetVehicleType()
         {
             string input = ui.GetInput();
-            VehicleType parsedVehicle = Enum.TryParse(input.ToUpper(), out parsedVehicle) ? parsedVehicle : (VehicleType)Activator.CreateInstance(typeof(VehicleType));
+            VehicleType parsedVehicle = Enum.TryParse(input.ToUpper(), out parsedVehicle) ? parsedVehicle : VehicleType.All;
             return parsedVehicle;
         }
 
@@ -190,11 +250,13 @@ namespace Garage
         {
             ui.Print("Enter nr of seats");
             var nrOfSeats = ui.GetInput();
-            IVehicle motorCycleToPark = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfSeats));
-            if (handler.AddVehicle(motorCycleToPark))
-                ui.Print($"Successfully parked {motorCycleToPark}");
+            var mc = vehicle as Motorcycle;
+            mc.NrOfSeats = util.ValidateNumber(nrOfSeats);
+            //mc = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfSeats));
+            if (handler.AddVehicle(vehicle))
+                ui.Print($"Successfully parked {vehicle}");
             else
-                throw new Exception($"Could not park {motorCycleToPark}");
+                throw new Exception($"Could not park {vehicle}");
         }
 
         private void CreateCar(IVehicle vehicle)
@@ -291,6 +353,7 @@ namespace Garage
                     }
                 }
                 ui.Print("You need to park atleast 2 vehicles. Try again. Or type 'quit' to exit.");
+                nr = ui.GetInput().ToUpper();
             }
         }
 
@@ -308,20 +371,18 @@ namespace Garage
                         ui.Print("Garage created.");
                         break;
                     }
-                } catch(Exception e)
+                } catch(Exception ex) when (ex is ArgumentOutOfRangeException || ex is ArgumentException)
                 {
                     ui.Print($"Failed to create garage with capacity {capacity}. Try again.");
-                    ui.Print(e.Message);
                 }
                 capacity = ui.GetInput();
             }
         }
         private void CustomQuery()
         {
+            ui.Print("Write '0' on properties you DON'T want to query on.");
 
-            ui.Print("Write 'x' on license number and colour, and '0' on nr of wheels, if you DON'T want to query on them.");
-
-            IVehicle vehicleQuery = GetVehicleSpecs(true);
+            IVehicle vehicleQuery = GetVehicleSpecs(true)!;
             ui.DisplayVehicleOptions(true);
             VehicleType type = GetVehicleType();
             var result = handler.CustomQuery(vehicleQuery, type);
@@ -331,9 +392,7 @@ namespace Garage
                 return;
             }
             foreach (var r in result)
-            {
                 ui.Print(r.ToString());
-            }
         }
     }
 }

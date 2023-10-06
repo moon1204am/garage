@@ -4,9 +4,8 @@
     {
         string GetInput();
         void Print(string msg);
-        //Det skall gå att stänga av applikationen från gränssnittet
-        //void ShutDown();
         void Display();
-
+        void DisplayCommands();
+        void DisplayVehicleOptions(bool isQuery = false);
     }
 }

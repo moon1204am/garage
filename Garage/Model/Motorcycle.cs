@@ -2,8 +2,8 @@
 {
     internal class Motorcycle : Vehicle
     {
-        public int NrOfSeats { get; }
-        public Motorcycle(string licenseNumber, string colur, int nrOfWheels, int nrOfSeats) : base(licenseNumber, colur, nrOfWheels)
+        public int NrOfSeats { get; set; }
+        public Motorcycle(string licenseNumber, string colour, int nrOfWheels, int nrOfSeats) : base(licenseNumber, colour, nrOfWheels)
         {
             NrOfSeats = nrOfSeats;
         }

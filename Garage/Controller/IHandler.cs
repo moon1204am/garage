@@ -5,6 +5,7 @@ namespace Garage.Controller
 {
     internal interface IHandler
     {
+        bool IsLoaded { get; set; }
         //Lista samtliga parkerade fordon
         IEnumerable<IVehicle> GetParkedVehicles();
         //Lista fordonstyper och hur många av varje som står i garaget
@@ -32,6 +33,8 @@ namespace Garage.Controller
         bool LicenseAlreadyExists(string license);
         int CheckForFreeSpots();
         IEnumerable<IVehicle> CustomQuery(IVehicle vehicle, VehicleType type);
+        bool Save(string name);
+        bool Load(string input);
 
         //Applikationen skall fel hantera indata på ett robust sätt, så att den inte kraschar vid felaktig inmatning eller användning.
     }

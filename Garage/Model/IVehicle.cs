@@ -2,8 +2,8 @@
 {
     public interface IVehicle
     {
-        string LicenseNumber { get; set; }
-        string Colour { get; set; }
+        string LicenseNumber { get; }
+        string Colour { get; }
         int NrOfWheels { get; }
     }
 }

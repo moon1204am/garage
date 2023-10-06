@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
 
 namespace Garage.Model
 {
     public class Garage<T> : IEnumerable<T> where T : IVehicle
     {
+        
         private T[] vehicles;
         private int currentIndex;
         private int count;
@@ -11,6 +13,7 @@ namespace Garage.Model
         public int GetCount => count;
         public bool IsFull => GetFreeSpaces == 0;
         public int Capacity { get; }
+
         public Garage(int capacity)
         {
             if(capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
@@ -19,6 +22,7 @@ namespace Garage.Model
             currentIndex = 0;
             count = 0;
         }
+
         public bool Insert(T vehicle)
         {
             ArgumentNullException.ThrowIfNull(vehicle);
@@ -36,15 +40,16 @@ namespace Garage.Model
             count++;
             return true;
         }
+
         public bool Remove(IVehicle vehicleToRemove)
         {
             int index = Array.IndexOf(vehicles, vehicleToRemove);
-            //int index = Array.FindIndex(vehicles, vehicle => vehicle != null && vehicle.LicenseNumber == licenseNr);
             if (index == -1) return false;
             vehicles[index] = default(T)!;
             count--;
             return true;
         }
+
         private int SearchForFreeSpace()
         {
             for (int i = 0; i < vehicles.Length; i++)
@@ -54,15 +59,16 @@ namespace Garage.Model
             }
             return -1;
         }
+
         public IEnumerator<T> GetEnumerator()
         {
-            
             foreach (T v in vehicles)
             {
              if(v is not null)   
                 yield return v;
             }
         }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

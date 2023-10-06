@@ -1,22 +1,24 @@
-﻿using System.Text.RegularExpressions;
+﻿using Garage.Model;
+using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 
 namespace Garage.View
 {
-    internal class Util
+    internal class Validator
     {
-        public void ValidateText(string input)
+        public string ValidateText(string input)
         {
-            throw new NotImplementedException();
+            return string.IsNullOrWhiteSpace(input) ? throw new ArgumentNullException() : input;
         }
 
         public int ValidateNumber(string text)
         {
-            return int.TryParse(text, out var value) ? value : throw new Exception("Not a number");
+            return int.TryParse(text, out var value) ? value : throw new ArgumentException("Not a number");
         }
 
         public double ValidateDouble(string text)
         {
-            return double.TryParse(text, out var value) ? value : throw new Exception("Not a number");
+            return double.TryParse(text, out var value) ? value : throw new ArgumentException("Not a number");
         }
 
         public bool ValidateLicenseNumber(string licenseNumber)

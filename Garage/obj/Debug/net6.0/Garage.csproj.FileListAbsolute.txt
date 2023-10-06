@@ -12,3 +12,6 @@ C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\refint\Garage.dll
 C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\Garage.pdb
 C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\Garage.genruntimeconfig.cache
 C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\ref\Garage.dll
+C:\Users\jobb\source\repos\Garage\Garage\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\Garage.csproj.AssemblyReference.cache
+C:\Users\jobb\source\repos\Garage\Garage\obj\Debug\net6.0\Garage.csproj.CopyComplete
