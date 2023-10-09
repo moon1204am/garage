@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections;
+﻿using System.Collections;
 
 namespace Garage.Model
 {
@@ -12,8 +11,8 @@ namespace Garage.Model
         private T[] vehicles;
         private int currentIndex;
         private int count;
-        public int GetFreeSpaces => Capacity - GetCount;
-        public int GetCount => count;
+        public int GetFreeSpaces => Capacity - Count;
+        public int Count => count;
         public bool IsFull => GetFreeSpaces == 0;
         public int Capacity { get; }
 

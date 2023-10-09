@@ -10,6 +10,7 @@
         {
             FuelType = fuelType;
         }
+
         public override string ToString() => $"{base.ToString()}\nFuel type: {FuelType}";
     }
 }

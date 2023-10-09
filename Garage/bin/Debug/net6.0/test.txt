@@ -1,0 +1,7 @@
+Capacity:3
+Type:2
+{"NrOfEngines":3,"LicenseNumber":"ABC123","Colour":"PINK","NrOfWheels":3}
+Type:2
+{"NrOfEngines":3,"LicenseNumber":"ABC124","Colour":"WHITE","NrOfWheels":3}
+Type:2
+{"NrOfEngines":3,"LicenseNumber":"ABC125","Colour":"PURPLE","NrOfWheels":3}

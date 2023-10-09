@@ -33,7 +33,7 @@
             }
         }
 
-        public string GetInput() => Console.ReadLine();
+        public string GetInput() => Console.ReadLine()!;
 
 
         public void Print(string msg) => Console.WriteLine(msg);

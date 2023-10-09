@@ -1,4 +1,3 @@
-using Garage.Controller;
 using Garage.Model;
 
 namespace Garage.Test
@@ -7,7 +6,7 @@ namespace Garage.Test
     {
         private Airplane airplane;
         private Car car;
-        Garage<IVehicle> garage;
+        Garage<IVehicle>? garage;
 
         public GarageTest()
         {
@@ -78,7 +77,7 @@ namespace Garage.Test
             int expected = 2;
 
             //Act
-            int actual = garage.GetCount;
+            int actual = garage.Count;
 
             //Assert
             Assert.Equal(expected, actual);
@@ -117,6 +116,4 @@ namespace Garage.Test
             Assert.Equal(expected, actual);
         }
     }
-
-
 }

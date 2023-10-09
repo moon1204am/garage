@@ -10,7 +10,7 @@
         {
             Length = length;
         }
-        public override string ToString() => $"{base.ToString()}\nLength: {Length}";
 
+        public override string ToString() => $"{base.ToString()}\nLength: {Length}";
     }
 }

@@ -47,7 +47,6 @@ namespace Garage
                         ui.Print("Created garage with value used from configuration file.");
                         break;
                     }
-                    
                 }
                 else
                 { 
@@ -224,9 +223,8 @@ namespace Garage
         {
             ui.Print("Enter nr of seats");
             var nrOfSeats = ui.GetInput();
-            var mc = vehicle as Motorcycle;
-            mc.NrOfSeats = validator.ValidateNumber(nrOfSeats);
-            //mc = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfSeats));
+            
+            var motorcycleToPark = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateNumber(nrOfSeats));
             if (handler.AddVehicle(vehicle))
                 ui.Print($"Successfully parked {vehicle}");
             else
@@ -237,7 +235,7 @@ namespace Garage
         {
             ui.Print("Enter cylinder volume");
             var cylinderVolume = ui.GetInput();
-            IVehicle carToPark = new Car(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(cylinderVolume));
+            var carToPark = new Car(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(cylinderVolume));
             if (handler.AddVehicle(carToPark))
                 ui.Print($"Successfully parked {carToPark}");
             else
@@ -248,7 +246,7 @@ namespace Garage
         {
             ui.Print("Enter fuel type");
             var fuelType = ui.GetInput();
-            IVehicle busToPark = new Bus(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, fuelType);
+            var busToPark = new Bus(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, fuelType);
             if (handler.AddVehicle(busToPark))
                 ui.Print($"Successfully parked {busToPark}");
             else
@@ -259,7 +257,7 @@ namespace Garage
         {
             ui.Print("Enter length");
             var length = ui.GetInput();
-            IVehicle boatToPark = new Boat(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(length));
+            var boatToPark = new Boat(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(length));
             if (handler.AddVehicle(boatToPark))
                 ui.Print($"Successfully parked {boatToPark}");
             else
@@ -270,7 +268,7 @@ namespace Garage
         {
             ui.Print("Enter nr of engines");
             var nrOfEngines = ui.GetInput();
-            IVehicle airplaneToPark = new Airplane(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateNumber(nrOfEngines));
+            var airplaneToPark = new Airplane(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateNumber(nrOfEngines));
             if (handler.AddVehicle(airplaneToPark))
                 ui.Print($"Successfully parked {airplaneToPark}");
             else
@@ -299,7 +297,7 @@ namespace Garage
             string licenseNr = ui.GetInput().ToUpper();
             while (licenseNr != "QUIT")
             {
-                IVehicle foundVehicle = handler.GetVehicleByLicense(licenseNr);
+                IVehicle? foundVehicle = handler.GetVehicleByLicense(licenseNr);
                 if (foundVehicle != null)
                 {
                     ui.Print($"Vehicle with license nr {licenseNr} = {foundVehicle.ToString()}");
@@ -366,7 +364,7 @@ namespace Garage
                 return;
             }
             foreach (var r in result)
-                ui.Print(r.ToString());
+                ui.Print(r.ToString()!);
         }
 
         private void SaveGarage()
@@ -383,16 +381,22 @@ namespace Garage
                 }
                 ui.Print("Garage could not be saved.");
             }
-            //else
-            //{
-            //    bool updated = handler.Update(name);
-            //}
+            else if(handler.IsLoaded)
+            {
+                ui.Print("Enter name of garage to save it.");
+                var name = ui.GetInput().ToLower();
+                bool updated = handler.Update(name);
+                if(updated)
+                {
+                    ui.Print("Garage successfully updated.");
+                }
+            }
         }
 
         private bool LoadGarage()
         {
             ui.Print("Enter garage name to load");
-            var input = ui.GetInput().ToUpper();
+            var input = ui.GetInput().ToLower();
             while (input != "QUIT")
             {
                 try
@@ -404,7 +408,7 @@ namespace Garage
                     ui.Print(e.Message);
                     ui.Print("Try again or type 'quit' to exit.");
                 }
-                input = ui.GetInput().ToUpper();
+                input = ui.GetInput().ToLower();
             }
             return false;
         }

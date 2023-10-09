@@ -16,9 +16,9 @@ namespace Garage.Controller
             this.util = util;
         }
 
-        //public int Capacity => garage.Capacity;
+        public int currentIndex { get; set; }
 
-        public int GetCount => garage.GetCount;
+        public int GetCount => garage.Count;
 
         public bool IsLoaded => util.IsLoaded;
 
@@ -45,7 +45,7 @@ namespace Garage.Controller
 
         public bool LicenseAlreadyExists(string license) => garage.Any(v => v.LicenseNumber == license);
 
-        public IVehicle GetVehicleByLicense(string licenseNumber) => garage.FirstOrDefault(v => v.LicenseNumber == licenseNumber);
+        public IVehicle? GetVehicleByLicense(string licenseNumber) => garage.FirstOrDefault(v => v.LicenseNumber == licenseNumber);
 
         public IEnumerable<VehicleDTO> GetCountOfEachType()
         {
@@ -67,14 +67,20 @@ namespace Garage.Controller
 
         public bool Save(string name)
         {
-            if (garage.GetCount == 0)
+            if (garage.Count == 0)
                 return false;
 
             return util.Save(name, garage.Capacity, GetParkedVehicles());
         }
-        public bool Load(string input) => util.Load(input, CreateGarage, AddVehicle);
-
-        //public bool GarageIsLoaded() =>  util.IsLoaded;
+        public bool Load(string input)
+        {
+            if(util.Load(input, CreateGarage, AddVehicle))
+            {
+                currentIndex = (garage.Capacity - garage.Count) + 1;
+                return true;
+            }
+            return false;
+        }
 
         public bool CreateGarageFromConfig()
         {
@@ -82,9 +88,10 @@ namespace Garage.Controller
             return CreateGarage(capacity);
         }
 
-        //public bool Update(string name)
-        //{
-        //    return util.Update(name);
-        //}
+        public bool Update(string name)
+        {
+            var newVehicles = GetParkedVehicles().Skip(currentIndex);
+            return util.Update(name, newVehicles);
+        }
     }
 }
