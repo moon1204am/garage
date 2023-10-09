@@ -1,11 +1,14 @@
 ﻿namespace Garage.View
 {
+    /// <summary>
+    /// Class responsible for the user interface. Reads inputs, displays user commands and prints information to the user.
+    /// </summary>
     internal class ConsoleUI : IUI
     {
-
         public void Display() => Print("Welcome. " +
-            "\n1. Please create garage first. " +
-            "\n2. Or load a previous garage.");
+            "\n1. Create garage." +
+            "\n2. Load a previous garage." +
+            "\n3. Load garage from configuration file.");
             
         public void DisplayCommands()
         {

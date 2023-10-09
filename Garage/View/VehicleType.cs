@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Garage.View
 {
+    /// <summary>
+    /// All vehicle types with underlying values.
+    /// </summary>
     public enum VehicleType
     {
         Airplane = 1,

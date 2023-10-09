@@ -38,3 +38,13 @@ Capacity:3
 Name:NO
 Type:2
 {"NrOfEngines":3,"LicenseNumber":"ABC123","Colour":"PINK","NrOfWheels":3}
+Capacity:4
+Name:TWOCARS
+Type:2
+{"NrOfEngines":3,"LicenseNumber":"ABC123","Colour":"WHITE","NrOfWheels":3}
+Type:3
+{"Length":5.5,"LicenseNumber":"ABC124","Colour":"PINK","NrOfWheels":2}
+Capacity:3
+Name:testtt
+Type:2
+{"NrOfEngines":3,"LicenseNumber":"ABC123","Colour":"PINK","NrOfWheels":3}

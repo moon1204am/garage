@@ -1,5 +1,8 @@
 ﻿namespace Garage.Model
 {
+    /// <summary>
+    /// Class representing a Car.
+    /// </summary>
     public class Car : Vehicle
     {
         public double CylinderVolume { get; }

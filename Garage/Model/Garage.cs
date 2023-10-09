@@ -3,9 +3,12 @@ using System.Collections;
 
 namespace Garage.Model
 {
+    /// <summary>
+    /// Generic class responsible for holding the garage and it's data.
+    /// </summary>
+    /// <typeparam name="T">must be IVehicle or implement IVehicle</typeparam>
     public class Garage<T> : IEnumerable<T> where T : IVehicle
     {
-        
         private T[] vehicles;
         private int currentIndex;
         private int count;
@@ -16,13 +19,18 @@ namespace Garage.Model
 
         public Garage(int capacity)
         {
-            if(capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
+            if(capacity < GarageSettings.MinimumCapacity) throw new ArgumentOutOfRangeException(nameof(capacity));
             Capacity = capacity;
             vehicles = new T[capacity];
             currentIndex = 0;
             count = 0;
         }
 
+        /// <summary>
+        /// Inserts a vehicle to the garage.
+        /// </summary>
+        /// <param name="vehicle">The vehicle to be inserted.</param>
+        /// <returns>True if vehicle was inserted, otherwise false.</returns>
         public bool Insert(T vehicle)
         {
             ArgumentNullException.ThrowIfNull(vehicle);
@@ -41,6 +49,11 @@ namespace Garage.Model
             return true;
         }
 
+        /// <summary>
+        /// Removes a vehicle from the garage.
+        /// </summary>
+        /// <param name="vehicleToRemove">The vehicle to remove.</param>
+        /// <returns>True if the vehicle was removed, otherwise false.</returns>
         public bool Remove(IVehicle vehicleToRemove)
         {
             int index = Array.IndexOf(vehicles, vehicleToRemove);
@@ -50,6 +63,10 @@ namespace Garage.Model
             return true;
         }
 
+        /// <summary>
+        /// Search for a free space in the garage array.
+        /// </summary>
+        /// <returns>The found free index of array, otherwise -1.</returns>
         private int SearchForFreeSpace()
         {
             for (int i = 0; i < vehicles.Length; i++)
@@ -60,6 +77,10 @@ namespace Garage.Model
             return -1;
         }
 
+        /// <summary>
+        /// Implementation called when foreach looping through the garage.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<T> GetEnumerator()
         {
             foreach (T v in vehicles)

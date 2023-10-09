@@ -1,6 +1,9 @@
 ﻿namespace Garage.Model
 {
-    internal class Bus : Vehicle
+    /// <summary>
+    /// Class representing a Bus.
+    /// </summary>
+    public class Bus : Vehicle
     {
         public string FuelType { get; }
         public Bus(string licenseNumber, string colour, int nrOfWheels, string fuelType) : base(licenseNumber, colour, nrOfWheels)

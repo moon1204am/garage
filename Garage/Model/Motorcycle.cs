@@ -1,5 +1,8 @@
 ﻿namespace Garage.Model
 {
+    /// <summary>
+    /// Class representing a Motorcycle.
+    /// </summary>
     internal class Motorcycle : Vehicle
     {
         public int NrOfSeats { get; set; }

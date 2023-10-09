@@ -1,35 +1,30 @@
 ﻿using Garage.Model;
 using Garage.View;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Garage.Controller
 {
-    /* En GarageHandler. För att abstrahera ett lager så att det inte finns någon direkt
-     * kontakt mellan användargränssnittet och garage klassen. Detta görs lämpligen
-     * genom en klass som hanterar funktionaliteten som gränssnittet behöver ha tillgång till.
-    */
+    /// <summary>
+    /// Class that acts as an abstraction layer between the user interface and the Garage class.
+    /// </summary>
     public class GarageHandler : IHandler
     {
         Garage<IVehicle> garage = default!;
-        public bool IsLoaded { get; set; }
+        Utilities util;
+
+        public GarageHandler(Utilities util)
+        {
+            this.util = util;
+        }
+
+        //public int Capacity => garage.Capacity;
+
+        public int GetCount => garage.GetCount;
+
+        public bool IsLoaded => util.IsLoaded;
 
         public bool AddVehicle(IVehicle vehicle)
         {
             return garage.Insert(vehicle);
-        }
-
-        public bool AddVehicles(IVehicle[] vehicles)
-        {
-            bool added = true;
-            for (int i = 0; i < vehicles.Length; i++) 
-            {
-                added = AddVehicle(vehicles[i]);
-                if (!added) added = false;
-            }
-            return added;
         }
 
         public bool CreateGarage(int capacity)
@@ -72,141 +67,24 @@ namespace Garage.Controller
 
         public bool Save(string name)
         {
-            if (garage.GetCount == 0 || NameExists(name))
+            if (garage.GetCount == 0)
                 return false;
 
-            var options = new JsonSerializerOptions();
-            //var jsonString = JsonSerializer.Serialize(v, v.GetType(), options);
-
-            using (StreamWriter sw = File.AppendText("garages.txt"))
-            {
-                sw.WriteLine($"Capacity:{garage.Capacity}");
-                sw.WriteLine($"Name:{name}");
-                foreach (var v in garage)
-                {
-                    //var jsonVehicle = JsonSerializer.Serialize(v);
-                    //var jsonVehicle = JsonConvert.SerializeObject(v);
-                    var jsonVehicle = JsonSerializer.Serialize(v, v.GetType(), options);
-                    sw.WriteLine($"Type:{GetVehicleType(v)}");
-                    sw.WriteLine(jsonVehicle);
-                }
-            }
-            return true;
+            return util.Save(name, garage.Capacity, GetParkedVehicles());
         }
+        public bool Load(string input) => util.Load(input, CreateGarage, AddVehicle);
 
-        public bool Load(string name)
+        //public bool GarageIsLoaded() =>  util.IsLoaded;
+
+        public bool CreateGarageFromConfig()
         {
-            if (!NameExists(name))
-                throw new Exception("Name did not exist");
-
-            using (StreamReader reader = new StreamReader("garages.txt"))
-            {
-                var capacity = GetCapacity(reader, name);
-                if (capacity < 1) return false;
-                CreateGarage(capacity);
-                string type = string.Empty;
-                
-                while (!reader.EndOfStream)
-                {
-                    var json = reader.ReadLine();
-                    if (json.Contains("Capacity:"))
-                    {
-                        IsLoaded = true;
-                        return true;
-                    }
-                    
-                    if (json.Contains("Type:"))
-                    {
-                        string[] split = json.Split(":");
-                        type = split[1];
-                    }
-                    json = reader.ReadLine();
-                    if (!string.IsNullOrEmpty(type))
-                    {
-                        IVehicle? vehicleObj = null;
-                        switch (type)
-                        {
-                            case "2":
-                                //vehicleObj = JsonConvert.DeserializeObject<Airplane>(text);
-                                vehicleObj = JsonSerializer.Deserialize<Airplane>(json);
-                                break;
-                            case "3":
-                                //vehicleObj = JsonConvert.DeserializeObject<Boat>(text);
-                                vehicleObj = JsonSerializer.Deserialize<Boat>(json);
-                                break;
-                            case "4":
-                                //vehicleObj = JsonConvert.DeserializeObject<Bus>(text);
-                                vehicleObj = JsonSerializer.Deserialize<Bus>(json);
-                                break;
-                            case "5":
-                                //vehicleObj = JsonConvert.DeserializeObject<Car>(text);
-                                vehicleObj = JsonSerializer.Deserialize<Car>(json);
-                                break;
-                            case "6":
-                                //vehicleObj = JsonConvert.DeserializeObject<Motorcycle>(text);
-                                vehicleObj = JsonSerializer.Deserialize<Motorcycle>(json);
-                                break;
-                        }
-                        //var vehicleObj = JsonSerializer.Deserialize<Vehicle>(text);
-                        //var vehicleObj = JsonConvert.DeserializeObject<IVehicle>(text);
-                        garage.Insert(vehicleObj!);
-                    }
-                }
-                return false;
-            }
-        }
-        private bool NameExists(string nameToCheck)
-        {
-            using (StreamReader reader = new StreamReader("garages.txt"))
-            {
-                while (!reader.EndOfStream)
-                {
-                    var text = reader.ReadLine();
-                    if (text.Contains("Name:"))
-                    {
-                        string[] split = text.Split(":");
-                        if (split[1] == nameToCheck) return true;
-                    }
-                }
-            }
-            return false;
+            int capacity = util.ReadCapacityFromConfig();
+            return CreateGarage(capacity);
         }
 
-        private int GetCapacity(StreamReader reader, string name)
-        {
-            int capacity = -1;
-            while(!reader.EndOfStream) 
-            {
-                var info = reader.ReadLine();
-                if (info.Contains("Capacity"))
-                {
-                    string[] split = info.Split(':');
-                    capacity = int.Parse(split[1]);
-                    info = reader.ReadLine();
-                    if (info.Contains($"Name:{name}"))
-                    {
-                        return capacity;
-                    }
-                }
-            
-                
-            }
-            return capacity;
-        }
-
-        public string GetVehicleType(IVehicle v)
-        {
-            if (v is Airplane)
-                return "2";
-            else if (v is Boat)
-                return "3";
-            else if (v is Bus)
-                return "4";
-            else if (v is Car)
-                return "5";
-            else if (v is Motorcycle)
-                return "6";
-            return "0";
-        }
+        //public bool Update(string name)
+        //{
+        //    return util.Update(name);
+        //}
     }
 }

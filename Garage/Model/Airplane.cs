@@ -1,5 +1,8 @@
 ﻿namespace Garage.Model
 {
+    /// <summary>
+    /// Class representing an Airplane.
+    /// </summary>
     public class Airplane : Vehicle
     {
         public int NrOfEngines { get; }

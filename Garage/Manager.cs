@@ -4,23 +4,25 @@ using Garage.View;
 
 namespace Garage
 {
+    /// <summary>
+    /// Manages the applications UI and IHandler. All calls to the handler goes through this class.
+    /// </summary>
     internal class Manager
     {
         private IHandler handler;
         private IUI ui;
-        private Validator util;
+        private Validator validator;
         private bool keepReceivingCmds;
-        
 
         public Manager(IHandler handler, IUI ui) 
         {
             this.handler = handler;
             this.ui = ui;
-            util = new Validator();
+            validator = new Validator();
         }
+
         public void Start()
         {
-            
             while(true)
             {
                 ui.Display();
@@ -36,8 +38,16 @@ namespace Garage
                     {
                         ui.Print("Garage successfully loaded");
                         break;
+                    }  
+                }
+                else if (input == "3")
+                {
+                    if(handler.CreateGarageFromConfig())
+                    {
+                        ui.Print("Created garage with value used from configuration file.");
+                        break;
                     }
-                        
+                    
                 }
                 else
                 { 
@@ -46,26 +56,6 @@ namespace Garage
                 }
             }
             GetUserCommand();
-        }
-
-        private bool LoadGarage()
-        {
-            ui.Print("Enter garage name to load");
-            var input = ui.GetInput().ToUpper();
-            while(input != "QUIT")
-            {
-                try
-                {
-                    return handler.Load(input);
-                }
-                catch (Exception e)
-                {
-                    ui.Print(e.Message);
-                    ui.Print("Try again or type 'quit' to exit.");
-                }
-                input = ui.GetInput().ToUpper();
-            }
-            return false;
         }
 
         public void GetUserCommand()
@@ -120,26 +110,10 @@ namespace Garage
             }
         }
 
-        private void SaveGarage()
-        {
-            if(!handler.IsLoaded) 
-            {
-                ui.Print("Please enter a name of the garage.");
-                var name = ui.GetInput().ToUpper();
-                bool saved = handler.Save(name);
-                if (saved)
-                {
-                    ui.Print("Garage was saved.");
-                    return;
-                }
-                ui.Print("Garage could not be saved.");
-            }
-        }
-
         private void GetParkedVehicles()
         {
             var parkedVehicles = handler.GetParkedVehicles();
-            if (util.checkEmpty(parkedVehicles))
+            if (validator.checkEmpty(parkedVehicles))
             {
                 ui.Print("No vehicles parked yet.");
                 return;
@@ -152,7 +126,7 @@ namespace Garage
         private void GetTypesOfVehicles()
         {
             var types = handler.GetCountOfEachType();
-            if(util.checkEmpty(types))
+            if(validator.checkEmpty(types))
             {
                 ui.Print("No vehicle type is parked yet.");
                 return;
@@ -183,7 +157,7 @@ namespace Garage
             var colour = ui.GetInput().ToUpper();
             ui.Print("Enter nr of wheels");
             var nrOfWheels = ui.GetInput();
-            IVehicle newVehicle = new Vehicle(licenseNr, colour, util.ValidateNumber(nrOfWheels));
+            IVehicle newVehicle = new Vehicle(licenseNr, colour, validator.ValidateNumber(nrOfWheels));
             return newVehicle;
         }
 
@@ -195,9 +169,9 @@ namespace Garage
             while (licenseNr != "QUIT")
             {
 
-                if(util.ValidateLicenseNumber(licenseNr) && !handler.LicenseAlreadyExists(licenseNr))
+                if(validator.ValidateLicenseNumber(licenseNr) && !handler.LicenseAlreadyExists(licenseNr))
                     break;
-                if (!util.ValidateLicenseNumber(licenseNr))
+                if (!validator.ValidateLicenseNumber(licenseNr))
                     ui.Print("License number is invalid. Try again.");
                 if (handler.LicenseAlreadyExists(licenseNr))
                     ui.Print("License nr already exists. Try again.");
@@ -206,13 +180,6 @@ namespace Garage
                 licenseNr = ui.GetInput().ToUpper();
             } 
             return licenseNr;
-        }
-
-        private VehicleType GetVehicleType()
-        {
-            string input = ui.GetInput();
-            VehicleType parsedVehicle = Enum.TryParse(input.ToUpper(), out parsedVehicle) ? parsedVehicle : VehicleType.All;
-            return parsedVehicle;
         }
 
         private void CreateVehicle(IVehicle vehicle)
@@ -246,12 +213,19 @@ namespace Garage
             }
         }
 
+        private VehicleType GetVehicleType()
+        {
+            string input = ui.GetInput();
+            VehicleType parsedVehicle = Enum.TryParse(input.ToUpper(), out parsedVehicle) ? parsedVehicle : VehicleType.All;
+            return parsedVehicle;
+        }
+
         private void CreateMotorcycle(IVehicle vehicle)
         {
             ui.Print("Enter nr of seats");
             var nrOfSeats = ui.GetInput();
             var mc = vehicle as Motorcycle;
-            mc.NrOfSeats = util.ValidateNumber(nrOfSeats);
+            mc.NrOfSeats = validator.ValidateNumber(nrOfSeats);
             //mc = new Motorcycle(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfSeats));
             if (handler.AddVehicle(vehicle))
                 ui.Print($"Successfully parked {vehicle}");
@@ -263,7 +237,7 @@ namespace Garage
         {
             ui.Print("Enter cylinder volume");
             var cylinderVolume = ui.GetInput();
-            IVehicle carToPark = new Car(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateDouble(cylinderVolume));
+            IVehicle carToPark = new Car(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(cylinderVolume));
             if (handler.AddVehicle(carToPark))
                 ui.Print($"Successfully parked {carToPark}");
             else
@@ -285,7 +259,7 @@ namespace Garage
         {
             ui.Print("Enter length");
             var length = ui.GetInput();
-            IVehicle boatToPark = new Boat(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateDouble(length));
+            IVehicle boatToPark = new Boat(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateDouble(length));
             if (handler.AddVehicle(boatToPark))
                 ui.Print($"Successfully parked {boatToPark}");
             else
@@ -296,7 +270,7 @@ namespace Garage
         {
             ui.Print("Enter nr of engines");
             var nrOfEngines = ui.GetInput();
-            IVehicle airplaneToPark = new Airplane(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, util.ValidateNumber(nrOfEngines));
+            IVehicle airplaneToPark = new Airplane(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, validator.ValidateNumber(nrOfEngines));
             if (handler.AddVehicle(airplaneToPark))
                 ui.Print($"Successfully parked {airplaneToPark}");
             else
@@ -344,7 +318,7 @@ namespace Garage
             var nr = ui.GetInput();
             while (nr != "QUIT")
             {
-                int nrToPark = util.ValidateNumber(nr);
+                int nrToPark = validator.ValidateNumber(nr);
                 if (nrToPark > 1)
                 {
                     for (int i = 0; i < nrToPark; i++)
@@ -366,7 +340,7 @@ namespace Garage
                 try
                 {
                     ui.Print($"Creating garage with capacity {capacity}...");
-                    if (handler.CreateGarage(util.ValidateNumber(capacity)))
+                    if (handler.CreateGarage(validator.ValidateNumber(capacity)))
                     {
                         ui.Print("Garage created.");
                         break;
@@ -393,6 +367,46 @@ namespace Garage
             }
             foreach (var r in result)
                 ui.Print(r.ToString());
+        }
+
+        private void SaveGarage()
+        {
+            if (!handler.IsLoaded && handler.GetCount > 0)
+            {
+                ui.Print("Please enter a name of the garage.");
+                var name = ui.GetInput().ToLower();
+                bool saved = handler.Save(name);
+                if (saved)
+                {
+                    ui.Print("Garage was saved.");
+                    return;
+                }
+                ui.Print("Garage could not be saved.");
+            }
+            //else
+            //{
+            //    bool updated = handler.Update(name);
+            //}
+        }
+
+        private bool LoadGarage()
+        {
+            ui.Print("Enter garage name to load");
+            var input = ui.GetInput().ToUpper();
+            while (input != "QUIT")
+            {
+                try
+                {
+                    return handler.Load(input);
+                }
+                catch (Exception e)
+                {
+                    ui.Print(e.Message);
+                    ui.Print("Try again or type 'quit' to exit.");
+                }
+                input = ui.GetInput().ToUpper();
+            }
+            return false;
         }
     }
 }
