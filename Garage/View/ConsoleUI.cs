@@ -5,10 +5,10 @@
     /// </summary>
     internal class ConsoleUI : IUI
     {
-        public void Display() => Print("Welcome. " +
-            "\n1. Create garage." +
-            "\n2. Load a previous garage." +
-            "\n3. Load garage from configuration file.");
+        public void Display() => Print("Welcome. " 
+            + "\n1. Create garage." 
+            + "\n2. Load a previous garage." 
+            + "\n3. Load garage from configuration file.");
             
         public void DisplayCommands()
         {
@@ -21,6 +21,12 @@
                     + "\n7  Find vehicle by license number"
                     + "\n8  Custom query"
                     + "\n0. Shut down the application");
+        }
+
+        public void DisplayFuelTypes()
+        {
+            Print("1. Diesel" 
+                + "\n2. Gasoline");
         }
 
         public void DisplayVehicleOptions(bool isQuery = false)

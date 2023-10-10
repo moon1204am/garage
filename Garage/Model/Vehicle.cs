@@ -1,8 +1,10 @@
 ﻿namespace Garage.Model
 {
+    /// <summary>
+    /// Class representing a vehicle.
+    /// </summary>
     public class Vehicle : IVehicle
     {
-        //unique
         public string LicenseNumber { get; }
         public string Colour { get; }
         public int NrOfWheels { get; }

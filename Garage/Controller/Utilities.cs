@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace Garage.Controller
 {
     /// <summary>
-    /// Class that is responsible for saving new and loading existing garages.
+    /// Class that is responsible for saving, updating and loading garages.
     /// </summary>
     public class Utilities
     {
@@ -128,9 +128,8 @@ namespace Garage.Controller
 
         internal int ReadCapacityFromConfig()
         {
-            var capacity = config.GetSection("garage:garagesettings:capacity").Value;
+            var capacity = config.GetSection(GarageSettings.pathCapacity).Value;
             return int.TryParse(capacity, out int res) ? res : 0;
-
         }
     }
 }

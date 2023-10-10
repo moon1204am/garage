@@ -21,7 +21,7 @@ namespace Garage.Test
             garage = new Garage<IVehicle>(1);
 
             //Act
-            bool res = garage.Insert(airplane);
+            var res = garage.Insert(airplane);
 
             //Assert
             Assert.True(res);
@@ -39,6 +39,21 @@ namespace Garage.Test
 
             //Assert
             Assert.False(garage.Insert(car));
+            Assert.NotEqual(garage.First(), car);
+        }
+
+        [Fact]
+        public void AddVehicles_VehicleDoesNotExist_ShouldFail()
+        {
+            //Arrange
+            garage = new Garage<IVehicle>(1);
+            IVehicle vehicle = null;
+
+            //Act
+            Action action = () => garage.Insert(vehicle);
+
+            //Assert
+            Assert.Throws<ArgumentNullException>(action);
         }
 
         [Fact]
@@ -47,21 +62,23 @@ namespace Garage.Test
             //Arrange
             garage = new Garage<IVehicle>(1);
             garage.Insert(airplane);
+            IVehicle expected = null;
 
             //Act
-            bool res = garage.Remove(airplane);
+            var res = garage.Remove(airplane);
 
             //Assert
             Assert.True(res);
+            Assert.Equal(garage.FirstOrDefault(), expected);
         }
         [Fact]
-        public void RemoveVehicle_VehicleNotInGarage_ShouldFail()
+        public void RemoveVehicle_VehicleNotInGarage_ShouldReturnFalse()
         {
             //Arrange
             garage = new Garage<IVehicle>(1);
 
             //Act
-            bool res = garage.Remove(car);
+            var res = garage.Remove(car);
 
             //Assert
             Assert.False(res);
@@ -114,6 +131,19 @@ namespace Garage.Test
 
             //Assert
             Assert.Equal(expected, actual);
+        }
+
+
+        [Fact]
+        public void CreateGarage_CapacityIsZero_ShouldFail()
+        {
+            //Arrange
+            Action action = () => new Garage<IVehicle>(0);
+
+            //Act
+
+            //Assert
+            Assert.Throws<ArgumentOutOfRangeException>(action);
         }
     }
 }

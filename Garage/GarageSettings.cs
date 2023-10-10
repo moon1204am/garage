@@ -4,5 +4,6 @@
     {
         public const int MinimumCapacity = 0;
         public const string AppSettingsJson = "appsettings.json";
+        public const string pathCapacity = "garage:garagesettings:capacity";
     }
 }

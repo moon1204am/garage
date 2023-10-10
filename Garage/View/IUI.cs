@@ -7,5 +7,6 @@
         void Display();
         void DisplayCommands();
         void DisplayVehicleOptions(bool isQuery = false);
+        void DisplayFuelTypes();
     }
 }

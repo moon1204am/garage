@@ -18,7 +18,7 @@ namespace Garage.Model
 
         public Garage(int capacity)
         {
-            if(capacity < GarageSettings.MinimumCapacity) throw new ArgumentOutOfRangeException(nameof(capacity));
+            if(capacity <= GarageSettings.MinimumCapacity) throw new ArgumentOutOfRangeException(nameof(capacity));
             Capacity = capacity;
             vehicles = new T[capacity];
             currentIndex = 0;
@@ -32,7 +32,7 @@ namespace Garage.Model
         /// <returns>True if vehicle was inserted, otherwise false.</returns>
         public bool Insert(T vehicle)
         {
-            ArgumentNullException.ThrowIfNull(vehicle);
+            ArgumentNullException.ThrowIfNull(vehicle, nameof(vehicle));
             if(IsFull) return false;
             else if (currentIndex == (Capacity - 1) && vehicles[currentIndex] != null)
             {
@@ -55,6 +55,7 @@ namespace Garage.Model
         /// <returns>True if the vehicle was removed, otherwise false.</returns>
         public bool Remove(IVehicle vehicleToRemove)
         {
+            ArgumentNullException.ThrowIfNull(vehicleToRemove, nameof(vehicleToRemove));
             int index = Array.IndexOf(vehicles, vehicleToRemove);
             if (index == -1) return false;
             vehicles[index] = default(T)!;

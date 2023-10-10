@@ -119,7 +119,10 @@ namespace Garage
             }
 
             ui.Print("All parked vehicles right now:\n");
-            foreach (var vehicle in parkedVehicles) ui.Print(vehicle.ToString()!);
+            foreach (var vehicle in parkedVehicles) 
+            { 
+                ui.Print($"{vehicle.ToString()!}\n"); 
+            }
         }
 
         private void GetTypesOfVehicles()
@@ -245,7 +248,27 @@ namespace Garage
         private void CreateBus(IVehicle vehicle)
         {
             ui.Print("Enter fuel type");
+            ui.DisplayFuelTypes();
             var fuelType = ui.GetInput();
+            while(true) 
+            {
+                if (fuelType == "1")
+                {
+                    fuelType = "DIESEL";
+                    break;
+                }
+                else if (fuelType == "2")
+                {
+                    fuelType = "GASOLINE";
+                    break;
+                }
+                else
+                {
+                    ui.Print("Please choose between the alternatives.");
+                    fuelType = ui.GetInput();
+                }
+            }
+            
             var busToPark = new Bus(vehicle.LicenseNumber, vehicle.Colour, vehicle.NrOfWheels, fuelType);
             if (handler.AddVehicle(busToPark))
                 ui.Print($"Successfully parked {busToPark}");
