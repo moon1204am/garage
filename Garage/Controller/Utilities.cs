@@ -1,5 +1,6 @@
 ﻿using Garage.Model;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 using System.Text.Json;
 
 namespace Garage.Controller
@@ -16,34 +17,48 @@ namespace Garage.Controller
             this.config = config;
         }
 
+        string Name { get; set; } = null!;
         internal bool IsLoaded { get; set; }
 
         internal bool Save(string name, int capacity, IEnumerable<IVehicle> parkedVehicles)
         {
+            if (Name == null) Name = name;
+            else
+                if (Name != name) return false;
+
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if (File.Exists(path))
                 throw new Exception("Name already taken.");
 
-            using (StreamWriter sw = new StreamWriter(path))
-            {
-                sw.WriteLine($"Capacity:{capacity}");
-                WriteVehicles(sw, parkedVehicles);
-                
-            }
+            WriteVehicles(parkedVehicles, name, capacity);
             return true;
         }
 
-        internal bool Update(string name, IEnumerable<IVehicle> newVehicles)
+        internal bool Update(string name, IEnumerable<IVehicle> parkedVehicles, int capacity)
         {
+            if (name != Name) return false;   
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if (!File.Exists(path))
                 throw new Exception("Name did not exist.");
 
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                WriteVehicles(sw, newVehicles);
-            }
+            WriteVehicles(parkedVehicles, name, capacity);
             return true;
+        }
+
+        private void WriteVehicles(IEnumerable<IVehicle> vehicles, string path, int capacity)
+        {
+            using (StreamWriter sw = new StreamWriter(path))
+            {
+                sw.WriteLine($"Capacity:{capacity}");
+                var options = new JsonSerializerOptions();
+                foreach (var v in vehicles)
+                {
+                    var jsonVehicle = JsonSerializer.Serialize(v, v.GetType(), options);
+                    sw.WriteLine($"Type:{GetVehicleType(v)}");
+                    sw.WriteLine(jsonVehicle);
+                }
+            }
+                
         }
 
         private void WriteVehicles(StreamWriter sw, IEnumerable<IVehicle> vehicles)
@@ -62,7 +77,8 @@ namespace Garage.Controller
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if(!File.Exists(path))
                 throw new Exception("Name did not exist.");
-                
+
+            Name = name;
 
             using (StreamReader reader = new StreamReader(path))
             {
