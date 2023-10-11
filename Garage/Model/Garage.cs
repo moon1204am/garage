@@ -71,7 +71,7 @@ namespace Garage.Model
         {
             for (int i = 0; i < vehicles.Length; i++)
             {
-                if (vehicles[i] != null)
+                if (vehicles[i] == null)
                     return i;
             }
             return -1;

@@ -10,13 +10,11 @@ namespace Garage.Controller
     {
         Garage<IVehicle> garage = default!;
         Utilities util;
-
+        
         public GarageHandler(Utilities util)
         {
             this.util = util;
         }
-
-        public int currentIndex { get; set; }
 
         public int GetCount => garage.Count;
 
@@ -65,29 +63,11 @@ namespace Garage.Controller
             return result;
         }
 
-        public bool Save(string name)
-        {
-            if (garage.Count == 0)
-                return false;
+        public bool Save(string name) => garage.Count != 0 && util.Save(name, garage.Capacity, GetParkedVehicles());
 
-            return util.Save(name, garage.Capacity, GetParkedVehicles());
-        }
+        public bool Update(string name) => util.Update(name, GetParkedVehicles(), garage.Capacity);
 
-        public bool Update(string name)
-        {
-            var newVehicles = GetParkedVehicles().Skip(currentIndex);
-            return util.Update(name, newVehicles);
-        }
-
-        public bool Load(string input)
-        {
-            if(util.Load(input, CreateGarage, AddVehicle))
-            {
-                currentIndex = (garage.Capacity - garage.Count) + 1;
-                return true;
-            }
-            return false;
-        }
+        public bool Load(string name) => util.Load(name, CreateGarage, AddVehicle) ? true : false;
 
         public bool CreateGarageFromConfig()
         {
