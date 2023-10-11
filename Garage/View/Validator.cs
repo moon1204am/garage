@@ -65,7 +65,7 @@ namespace Garage.View
         /// <typeparam name="T">must be a reference type.</typeparam>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool checkEmpty<T>(IEnumerable<T> e) where T : class
+        public bool CheckEmpty<T>(IEnumerable<T> e) where T : class
         {
             return !e.Any();
         }

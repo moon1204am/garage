@@ -72,6 +72,13 @@ namespace Garage.Controller
 
             return util.Save(name, garage.Capacity, GetParkedVehicles());
         }
+
+        public bool Update(string name)
+        {
+            var newVehicles = GetParkedVehicles().Skip(currentIndex);
+            return util.Update(name, newVehicles);
+        }
+
         public bool Load(string input)
         {
             if(util.Load(input, CreateGarage, AddVehicle))
@@ -86,12 +93,6 @@ namespace Garage.Controller
         {
             int capacity = util.ReadCapacityFromConfig();
             return CreateGarage(capacity);
-        }
-
-        public bool Update(string name)
-        {
-            var newVehicles = GetParkedVehicles().Skip(currentIndex);
-            return util.Update(name, newVehicles);
         }
     }
 }

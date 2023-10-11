@@ -16,9 +16,9 @@ namespace Garage.Controller
             this.config = config;
         }
 
-        public bool IsLoaded { get; set; }
+        internal bool IsLoaded { get; set; }
 
-        public bool Save(string name, int capacity, IEnumerable<IVehicle> parkedVehicles)
+        internal bool Save(string name, int capacity, IEnumerable<IVehicle> parkedVehicles)
         {
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if (File.Exists(path))
@@ -57,7 +57,7 @@ namespace Garage.Controller
             }
         }
 
-        public bool Load(string name, Func<int, bool> create, Func<IVehicle, bool> add)
+        internal bool Load(string name, Func<int, bool> create, Func<IVehicle, bool> add)
         {
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if(!File.Exists(path))
@@ -111,7 +111,7 @@ namespace Garage.Controller
             }
         }
 
-        public string GetVehicleType(IVehicle v)
+        private string GetVehicleType(IVehicle v)
         {
             if (v is Airplane)
                 return "2";
@@ -128,7 +128,7 @@ namespace Garage.Controller
 
         internal int ReadCapacityFromConfig()
         {
-            var capacity = config.GetSection(GarageSettings.pathCapacity).Value;
+            var capacity = config.GetSection(GarageSettings.PathCapacity).Value;
             return int.TryParse(capacity, out int res) ? res : 0;
         }
     }

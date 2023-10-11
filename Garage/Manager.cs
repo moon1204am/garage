@@ -57,7 +57,7 @@ namespace Garage
             GetUserCommand();
         }
 
-        public void GetUserCommand()
+        private void GetUserCommand()
         {
             keepReceivingCmds = true;
             string input;
@@ -112,7 +112,7 @@ namespace Garage
         private void GetParkedVehicles()
         {
             var parkedVehicles = handler.GetParkedVehicles();
-            if (validator.checkEmpty(parkedVehicles))
+            if (validator.CheckEmpty(parkedVehicles))
             {
                 ui.Print("No vehicles parked yet.");
                 return;
@@ -128,7 +128,7 @@ namespace Garage
         private void GetTypesOfVehicles()
         {
             var types = handler.GetCountOfEachType();
-            if(validator.checkEmpty(types))
+            if(validator.CheckEmpty(types))
             {
                 ui.Print("No vehicle type is parked yet.");
                 return;
@@ -352,7 +352,7 @@ namespace Garage
             }
         }
 
-        public void NewGarage()
+        private void NewGarage()
         {
             ui.Print("Enter capacity of garage");
             var capacity = ui.GetInput();
