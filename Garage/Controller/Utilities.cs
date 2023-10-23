@@ -17,31 +17,32 @@ namespace Garage.Controller
             this.config = config;
         }
 
-        string Name { get; set; } = null!;
+        private string name = null!;
         internal bool IsLoaded { get; set; }
 
         internal bool Save(string name, int capacity, IEnumerable<IVehicle> parkedVehicles)
         {
-            if (Name == null) Name = name;
+            if (this.name == null) 
+                this.name = name;
             else
-                if (Name != name) return false;
+                if (this.name != name) return false;
 
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if (File.Exists(path))
                 throw new Exception("Name already taken.");
 
-            WriteVehicles(parkedVehicles, name, capacity);
+            WriteVehicles(parkedVehicles, path, capacity);
             return true;
         }
 
         internal bool Update(string name, IEnumerable<IVehicle> parkedVehicles, int capacity)
         {
-            if (name != Name) return false;   
+            if (name != this.name) return false;   
             string path = $"{Environment.CurrentDirectory}/{name}.txt";
             if (!File.Exists(path))
                 throw new Exception("Name did not exist.");
 
-            WriteVehicles(parkedVehicles, name, capacity);
+            WriteVehicles(parkedVehicles, path, capacity);
             return true;
         }
 
@@ -58,7 +59,6 @@ namespace Garage.Controller
                     sw.WriteLine(jsonVehicle);
                 }
             }
-                
         }
 
         private void WriteVehicles(StreamWriter sw, IEnumerable<IVehicle> vehicles)
@@ -78,7 +78,7 @@ namespace Garage.Controller
             if(!File.Exists(path))
                 throw new Exception("Name did not exist.");
 
-            Name = name;
+            this.name = name;
 
             using (StreamReader reader = new StreamReader(path))
             {

@@ -414,7 +414,7 @@ namespace Garage
         {
             ui.Print("Enter garage name to load");
             var input = ui.GetInput().ToLower();
-            while (input != "QUIT")
+            while (input != "quit")
             {
                 try
                 {
