@@ -5,7 +5,7 @@ namespace Garage.View
     /// <summary>
     /// Class responsible for validating user input and return values.
     /// </summary>
-    internal class Validator
+    internal class Validator : IValidator
     {
         /// <summary>
         /// Validates if a string is null or whitespace.
@@ -13,9 +13,9 @@ namespace Garage.View
         /// <param name="input">The string to validate.</param>
         /// <returns>the validated string</returns>
         /// <exception cref="ArgumentNullException">thrown if string is null or whitespace.</exception>
-        public string ValidateText(string input)
+        public string? ValidateText(string input)
         {
-            return string.IsNullOrWhiteSpace(input) ? throw new ArgumentNullException() : input;
+            return string.IsNullOrWhiteSpace(input) ? null : input;
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Garage.View
         /// <exception cref="ArgumentException">thrown if parsing failed, meaning the input was not an integer.</exception>
         public int ValidateNumber(string text)
         {
-            return int.TryParse(text, out var value) ? value : throw new ArgumentException("Not a number");
+            return int.TryParse(text, out var value) ? value : -1;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Garage.View
         /// <exception cref="ArgumentException">thrown if parsing failed.</exception>
         public double ValidateDouble(string text)
         {
-            return double.TryParse(text, out var value) ? value : throw new ArgumentException("Not a number");
+            return double.TryParse(text, out var value) ? value : -1;
         }
 
         /// <summary>

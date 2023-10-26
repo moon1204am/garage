@@ -11,14 +11,14 @@ namespace Garage
     {
         private IHandler handler;
         private IUI ui;
-        private Validator validator;
+        private IValidator validator;
         private bool keepReceivingCmds;
 
-        public Manager(IHandler handler, IUI ui) 
+        public Manager(IHandler handler, IUI ui, IValidator validator) 
         {
             this.handler = handler;
             this.ui = ui;
-            validator = new Validator();
+            this.validator = validator;
         }
 
         public void Start()
@@ -160,28 +160,46 @@ namespace Garage
             var licenseNr = GetLicenseNumber(isQuery);
             if(!isQuery && licenseNr == "QUIT") return null;
             ui.Print("Enter colour");
-            var colour = ui.GetInput().ToUpper();
+            var colour = validator.ValidateText(ui.GetInput().ToUpper());
+            while (colour == null) {
+                ui.Print("Please enter a valid color");
+                colour = validator.ValidateText(ui.GetInput().ToUpper());
+            }
             ui.Print("Enter nr of wheels");
-            var nrOfWheels = ui.GetInput();
-
+            var nrOfWheels = validator.ValidateNumber(ui.GetInput());
+            while (nrOfWheels == -1)
+            {
+                ui.Print("Please enter a valid nr");
+                nrOfWheels = validator.ValidateNumber(ui.GetInput());
+            }
             return GetTypeToCreate(type, licenseNr, colour, nrOfWheels);
         }
 
-        private IVehicle? GetTypeToCreate(VehicleType type, string licenseNr, string colour, string nrOfWheels)
+        private IVehicle? GetTypeToCreate(VehicleType type, string licenseNr, string colour, int nrOfWheels)
         {
             IVehicle vehicleToCreate = null!;
             if(type.Equals(VehicleType.Airplane)) 
             {
                 ui.Print("Enter nr of engines");
-                var nrOfEngines = ui.GetInput();
-                vehicleToCreate = new Airplane(licenseNr, colour, validator.ValidateNumber(nrOfWheels), validator.ValidateNumber(nrOfEngines));
+                var nrOfEngines = validator.ValidateNumber(ui.GetInput());
+                while(nrOfEngines == -1)
+                {
+                    ui.Print("Please enter a valid nr");
+                    nrOfEngines = validator.ValidateNumber(ui.GetInput());
+                }
+                vehicleToCreate = new Airplane(licenseNr, colour, nrOfWheels, nrOfEngines);
                 return vehicleToCreate;
             }
             else if(type.Equals(VehicleType.Boat))
             {
                 ui.Print("Enter length");
-                var length = ui.GetInput();
-                vehicleToCreate = new Boat(licenseNr, colour, validator.ValidateNumber(nrOfWheels), validator.ValidateDouble(length));
+                var length = validator.ValidateDouble(ui.GetInput());
+                while (length == -1)
+                {
+                    ui.Print("Please enter a valid nr");
+                    length = validator.ValidateNumber(ui.GetInput());
+                }
+                vehicleToCreate = new Boat(licenseNr, colour, nrOfWheels, length);
                 return vehicleToCreate;
             }
             else if (type.Equals(VehicleType.Bus))
@@ -207,27 +225,36 @@ namespace Garage
                         fuelType = ui.GetInput();
                     }
                 }
-                vehicleToCreate = new Bus(licenseNr, colour, validator.ValidateNumber(nrOfWheels), fuelType);
+                vehicleToCreate = new Bus(licenseNr, colour, nrOfWheels, fuelType);
                 return vehicleToCreate;
             }
             else if (type.Equals(VehicleType.Car))
             {
                 ui.Print("Enter cylinder volume");
-                var cylinderVolume = ui.GetInput();
-                vehicleToCreate = new Car(licenseNr, colour, validator.ValidateNumber(nrOfWheels), validator.ValidateDouble(cylinderVolume));
+                var cylinderVolume = validator.ValidateDouble(ui.GetInput());
+                while (cylinderVolume == -1)
+                {
+                    ui.Print("Please enter a valid nr");
+                    cylinderVolume = validator.ValidateNumber(ui.GetInput());
+                }
+                vehicleToCreate = new Car(licenseNr, colour, nrOfWheels, cylinderVolume);
                 return vehicleToCreate;
             }
             else if (type.Equals(VehicleType.Motorcycle))
             {
                 ui.Print("Enter nr of seats");
-                var nrOfSeats = ui.GetInput();
-
-                vehicleToCreate = new Motorcycle(licenseNr, colour, validator.ValidateNumber(nrOfWheels), validator.ValidateNumber(nrOfSeats));
+                var nrOfSeats = validator.ValidateNumber(ui.GetInput());
+                while (nrOfSeats == -1)
+                {
+                    ui.Print("Please enter a valid nr");
+                    nrOfSeats = validator.ValidateNumber(ui.GetInput());
+                }
+                vehicleToCreate = new Motorcycle(licenseNr, colour, nrOfWheels, nrOfSeats);
                 return vehicleToCreate;
             }
             else if(type.Equals(VehicleType.All))
             {
-                vehicleToCreate = new Vehicle(licenseNr, colour, validator.ValidateNumber(nrOfWheels));
+                vehicleToCreate = new Vehicle(licenseNr, colour, nrOfWheels);
             }
             return vehicleToCreate;
         }

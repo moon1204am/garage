@@ -22,6 +22,7 @@ namespace Garage
                                 services.AddSingleton<Utilities>();
                                 services.AddSingleton<IHandler, GarageHandler>();
                                 services.AddSingleton<IUI, ConsoleUI>();
+                                services.AddSingleton<IValidator, Validator>();
                                 services.AddSingleton<Manager>();
                                 
                             })
